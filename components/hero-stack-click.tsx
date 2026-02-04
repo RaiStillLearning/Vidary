@@ -6,9 +6,9 @@ import { AspectRatio } from "@/components/ui/aspect-ratio";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
 const HEROES = [
-  { id: 1, src: "https://avatar.vercel.sh/hero-1" },
-  { id: 2, src: "https://avatar.vercel.sh/hero-2" },
-  { id: 3, src: "https://avatar.vercel.sh/hero-3" },
+  { id: 1, src: "/movies/overlord.png" },
+  { id: 2, src: "/movies/one-piece.png" },
+  { id: 3, src: "/movies/adalah-pokoknya.png" },
 ];
 
 export default function HeroStackClick() {
@@ -27,7 +27,7 @@ export default function HeroStackClick() {
     setTimeout(() => {
       setActive(id);
       setIsFading(false);
-    }, 200); // durasi fade-out
+    }, 500); // durasi fade-out
   };
 
   return (

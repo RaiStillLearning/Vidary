@@ -1,19 +1,11 @@
 import HeroStackClick from "@/components/hero-stack-click";
 import MovieRow from "@/components/movie-row";
-import { mapOngoingAnime } from "@/lib/adapters/anime";
+import { getHomeOngoingAnime } from "@/lib/services/home";
 
-async function getHome() {
-  const res = await fetch("https://www.sankavollerei.com/anime/home", {
-    cache: "no-store",
-  });
-  return res.json();
-}
+// lib/services/anime.ts
 
 export default async function VidaryPage() {
-  const json = await getHome();
-
-  const ongoingAnime = mapOngoingAnime(json);
-
+  const ongoingAnime = await getHomeOngoingAnime();
   return (
     <main className="min-h-screen bg-background">
       <HeroStackClick />
