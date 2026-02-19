@@ -1,4 +1,5 @@
 import { getAnimeDetail } from "@/lib/api/api";
+import { EpisodeList } from "@/components/EpisodeList";
 
 interface PageProps {
   params: Promise<{ slug: string }>;
@@ -65,7 +66,7 @@ export default async function Page({ params }: PageProps) {
       </header>
 
       <div className="max-w-5xl mx-auto px-4 py-8 space-y-8">
-        {/* Info */}
+        {/* Anime Info */}
         <div className="flex gap-6">
           {anime.poster && (
             <img
@@ -100,20 +101,7 @@ export default async function Page({ params }: PageProps) {
 
         {/* Episode List */}
         {episodeList.length > 0 ? (
-          <div>
-            <h2 className="text-xl font-bold mb-4">Daftar Episode</h2>
-            <div className="grid gap-2 grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8">
-              {episodeList.map((ep: any) => (
-                <a
-                  key={ep.episodeId}
-                  href={`/anime/${slug}/episode/${ep.episodeId}`}
-                  className="rounded-lg p-3 text-center text-sm font-medium transition border bg-zinc-900 border-zinc-800 text-zinc-300 hover:bg-purple-600 hover:border-purple-500"
-                >
-                  Eps {ep.eps}
-                </a>
-              ))}
-            </div>
-          </div>
+          <EpisodeList episodes={episodeList} slug={slug} />
         ) : (
           <p className="text-zinc-500 text-sm">Tidak ada episode tersedia.</p>
         )}

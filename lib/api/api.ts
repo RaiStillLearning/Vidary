@@ -81,3 +81,24 @@ export async function getBatch(slug: string) {
 export async function getAllAnime() {
   return fetcher(`${BASE}/unlimited`);
 }
+
+// ============================================================
+// Tambahkan fungsi-fungsi ini ke file lib/api/api.ts yang ada
+// ============================================================
+
+const SAMEHADAKU_BASE = "https://www.sankavollerei.com/anime/samehadaku";
+
+// List semua movie (dengan pagination)
+export async function getSamehadakuMovieList(page: number = 1) {
+  return fetcher(`${SAMEHADAKU_BASE}/movies?page=${page}`);
+}
+
+// Detail movie by slug
+export async function getSamehadakuMovieDetail(slug: string) {
+  return fetcher(`${SAMEHADAKU_BASE}/anime/${slug}`);
+}
+
+// Get stream URL by server ID
+export async function getSamehadakuServer(serverId: string) {
+  return fetcher(`${SAMEHADAKU_BASE}/server/${serverId}`);
+}
