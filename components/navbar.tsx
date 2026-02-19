@@ -95,7 +95,7 @@ export function Navbar() {
 
           {/* LOGO */}
           <Image
-            src="/logos/vidary-logo.png"
+            src="/logos/Vidary-logo.png"
             alt="Vidary"
             width={120}
             height={40}

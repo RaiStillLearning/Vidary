@@ -12,6 +12,11 @@ export async function fetcher<T>(url: string): Promise<T | null> {
       console.error("API ERROR:", res.status, url);
       return null;
     }
+    if (!res.ok) {
+      const body = await res.text().catch(() => "");
+      console.error("API ERROR:", res.status, url, body.slice(0, 200));
+      return null;
+    }
 
     return await res.json();
   } catch (err) {

@@ -27,9 +27,9 @@ export async function getHome() {
   return fetcher(`${BASE}/home`);
 }
 
-// Anime Detail
+// Anime Detail ✅ FIXED
 export async function getAnimeDetail(slug: string) {
-  return fetcher(`${BASE}/${slug}`);
+  return fetcher(`${BASE}/anime/${slug}`);
 }
 
 // Episode Detail & Servers

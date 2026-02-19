@@ -1,112 +1,121 @@
-import { getEpisode } from "@/lib/api/episode.service";
-import type { EpisodeResponse } from "@/types/episode";
+import { getAnimeDetail } from "@/lib/api/api";
 
 interface PageProps {
   params: Promise<{ slug: string }>;
-  searchParams?: Promise<{ episode?: string }>;
 }
 
-export default async function Page({ params, searchParams }: PageProps) {
-  // ===============================
-  // NEXT 16 SAFE
-  // ===============================
+function getSynopsisText(synopsis: any): string {
+  if (!synopsis) return "";
+  if (typeof synopsis === "string") return synopsis;
+  if (typeof synopsis === "object") {
+    if (Array.isArray(synopsis.paragraphs)) {
+      return synopsis.paragraphs.join(" ");
+    }
+    const firstString = Object.values(synopsis).find(
+      (v) => typeof v === "string",
+    );
+    if (firstString) return firstString as string;
+  }
+  return "";
+}
+
+export default async function Page({ params }: PageProps) {
   const { slug } = await params;
-  const resolvedSearch = searchParams ? await searchParams : undefined;
 
-  // ===============================
-  // Tentukan Episode ID
-  // ===============================
-  // Jika ada ?episode= gunakan itu
-  // Jika tidak, anggap slug adalah episodeId
-  const episodeId = resolvedSearch?.episode ?? slug;
+  const res = (await getAnimeDetail(slug)) as any;
+  const anime = res?.data ?? null;
 
-  // ===============================
-  // Ambil Data Episode
-  // ===============================
-  const episodeResponse: EpisodeResponse | null = await getEpisode(episodeId);
-
-  const episode = episodeResponse?.data ?? null;
-
-  if (!episode) {
+  if (!anime) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-black text-red-500">
-        Anime tidak ditemukan
+      <div className="min-h-screen flex flex-col items-center justify-center bg-[#0a0a0f] gap-4">
+        <div className="text-6xl">😵</div>
+        <h2 className="text-2xl font-bold text-white">Anime Tidak Ditemukan</h2>
+        <a
+          href="/"
+          className="mt-2 px-5 py-2 bg-purple-600 hover:bg-purple-700 rounded-lg text-white text-sm font-semibold transition"
+        >
+          ← Beranda
+        </a>
       </div>
     );
   }
 
-  const streamUrl = episode.defaultStreamingUrl ?? null;
-  const episodeList = episode.info?.episodeList ?? [];
+  const episodeList = anime.episodeList ?? anime.info?.episodeList ?? [];
+  const synopsisText = getSynopsisText(anime.synopsis);
 
-  // ===============================
-  // RENDER (UI LO TETAP)
-  // ===============================
   return (
-    <div className="min-h-screen bg-black text-white p-6">
-      <div className="max-w-6xl mx-auto space-y-10">
-        {/* ================= INFO ================= */}
-        <div className="space-y-4">
-          <h1 className="text-3xl font-bold">{episode.title}</h1>
+    <div
+      className="min-h-screen text-white"
+      style={{
+        background:
+          "linear-gradient(135deg, #0a0a0f 0%, #0f0a1a 60%, #0a0a0f 100%)",
+      }}
+    >
+      <header className="sticky top-0 z-50 border-b border-zinc-800/60 backdrop-blur-md bg-black/40 px-6 py-3 flex items-center gap-3">
+        <a
+          href="/"
+          className="text-zinc-400 hover:text-white transition text-sm"
+        >
+          ← Beranda
+        </a>
+        <span className="text-zinc-700">/</span>
+        <span className="text-zinc-300 text-sm truncate max-w-xs">
+          {anime.title}
+        </span>
+      </header>
 
-          {episode.info?.duration && (
-            <p className="text-gray-400">Duration: {episode.info.duration}</p>
+      <div className="max-w-5xl mx-auto px-4 py-8 space-y-8">
+        {/* Info */}
+        <div className="flex gap-6">
+          {anime.poster && (
+            <img
+              src={anime.poster}
+              alt={anime.title}
+              className="w-40 rounded-xl object-cover shrink-0 shadow-lg"
+            />
           )}
+          <div className="space-y-3">
+            <h1 className="text-2xl md:text-3xl font-bold">{anime.title}</h1>
 
-          {episode.info?.genreList && (
-            <div className="flex flex-wrap gap-2">
-              {episode.info.genreList.map((g) => (
-                <span
-                  key={g.genreId}
-                  className="px-3 py-1 bg-zinc-800 rounded-md text-sm"
-                >
-                  {g.title}
-                </span>
-              ))}
-            </div>
-          )}
+            {synopsisText && (
+              <p className="text-zinc-400 text-sm leading-relaxed line-clamp-5">
+                {synopsisText}
+              </p>
+            )}
+
+            {anime.genreList && (
+              <div className="flex flex-wrap gap-2">
+                {anime.genreList.map((g: any) => (
+                  <span
+                    key={g.genreId}
+                    className="px-3 py-1 bg-zinc-800 border border-zinc-700/50 rounded-full text-xs text-zinc-300"
+                  >
+                    {g.title}
+                  </span>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
 
-        {/* ================= STREAM ================= */}
-        {streamUrl ? (
-          <div className="space-y-4">
-            <h2 className="text-2xl font-bold">Streaming</h2>
-
-            <iframe
-              src={streamUrl}
-              allowFullScreen
-              className="w-full aspect-video rounded-lg"
-            />
-
-            <a
-              href={streamUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-block bg-purple-600 px-6 py-3 rounded-lg hover:bg-purple-700 font-semibold"
-            >
-              ▶️ Buka di Tab Baru
-            </a>
-          </div>
-        ) : (
-          <div className="text-red-500">Streaming tidak tersedia</div>
-        )}
-
-        {/* ================= EPISODE LIST ================= */}
-        {episodeList.length > 0 && (
+        {/* Episode List */}
+        {episodeList.length > 0 ? (
           <div>
-            <h2 className="text-2xl font-bold mb-4">Daftar Episode</h2>
-
-            <div className="grid gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6">
-              {episodeList.map((ep) => (
+            <h2 className="text-xl font-bold mb-4">Daftar Episode</h2>
+            <div className="grid gap-2 grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8">
+              {episodeList.map((ep: any) => (
                 <a
                   key={ep.episodeId}
-                  href={`/anime/${slug}?episode=${ep.episodeId}`}
-                  className="rounded-lg bg-zinc-900 p-4 text-center hover:bg-purple-600"
+                  href={`/anime/${slug}/episode/${ep.episodeId}`}
+                  className="rounded-lg p-3 text-center text-sm font-medium transition border bg-zinc-900 border-zinc-800 text-zinc-300 hover:bg-purple-600 hover:border-purple-500"
                 >
-                  Episode {ep.eps}
+                  Eps {ep.eps}
                 </a>
               ))}
             </div>
           </div>
+        ) : (
+          <p className="text-zinc-500 text-sm">Tidak ada episode tersedia.</p>
         )}
       </div>
     </div>
