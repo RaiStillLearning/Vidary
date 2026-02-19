@@ -1,58 +1,73 @@
-import Image from "next/image";
+"use client";
+
 import Link from "next/link";
-import { Card, CardContent } from "@/components/ui/card";
+import Image from "next/image";
 
 interface AnimeCardProps {
   slug: string;
   title: string;
   image: string;
-  episode?: string;
+  episodes?: number;
+  releaseDay?: string;
+  latestReleaseDate?: string;
 }
 
 export default function AnimeCard({
   slug,
   title,
   image,
-  episode,
+  episodes,
+  releaseDay,
+  latestReleaseDate,
 }: AnimeCardProps) {
   return (
-    <Link href={`/anime/${slug}`} className="group">
-      <Card className="overflow-hidden border-0 bg-zinc-900 transition-all duration-300 hover:scale-105 hover:shadow-xl hover:shadow-purple-500/20">
-        <CardContent className="p-0">
-          {/* Image */}
-          <div className="relative aspect-[2/3] overflow-hidden">
-            <Image
-              src={
-                image ||
-                "https://images.unsplash.com/photo-1578632767115-351597cf2477?w=400"
-              }
-              alt={title}
-              fill
-              className="object-cover transition-transform duration-300 group-hover:scale-110"
-              sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 20vw"
-            />
-
-            {/* Gradient Overlay */}
-            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
-
-            {/* Episode Badge */}
-            {episode && (
-              <div className="absolute bottom-2 left-2">
-                <span className="rounded-md bg-purple-600 px-2 py-1 text-xs font-semibold text-white">
-                  {episode}
-                </span>
-              </div>
-            )}
+    <Link
+      href={`/anime/${slug}`}
+      className="group relative flex flex-col overflow-hidden rounded-xl bg-zinc-900 border border-zinc-800/60 hover:border-purple-500/50 transition-all duration-300 hover:scale-[1.03] hover:shadow-xl hover:shadow-purple-900/20"
+    >
+      {/* Poster */}
+      <div className="relative aspect-[2/3] w-full overflow-hidden bg-zinc-800">
+        {image ? (
+          <Image
+            src={image}
+            alt={title}
+            fill
+            className="object-cover transition-transform duration-500 group-hover:scale-105"
+            sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, 20vw"
+          />
+        ) : (
+          <div className="flex h-full items-center justify-center text-zinc-600 text-xs">
+            No Image
           </div>
+        )}
 
-          {/* Title */}
-          <div className="p-3">
-            <h3 className="line-clamp-2 text-sm font-semibold text-white transition-colors group-hover:text-purple-400">
-              {title}
-            </h3>
+        {/* Hover overlay */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+
+        {/* Episode badge */}
+        {episodes !== undefined && (
+          <div className="absolute top-2 right-2 rounded-md bg-black/70 backdrop-blur-sm px-2 py-0.5 text-xs font-semibold text-white border border-zinc-700/50">
+            Ep {episodes}
           </div>
-        </CardContent>
-      </Card>
+        )}
+
+        {/* Latest release date badge */}
+        {latestReleaseDate && (
+          <div className="absolute bottom-2 left-2 rounded-md bg-purple-600/90 backdrop-blur-sm px-2 py-0.5 text-xs font-medium text-white">
+            {latestReleaseDate}
+          </div>
+        )}
+      </div>
+
+      {/* Info */}
+      <div className="p-2.5 space-y-0.5">
+        <p className="text-xs font-medium text-white leading-tight line-clamp-2">
+          {title}
+        </p>
+        {releaseDay && (
+          <p className="text-[11px] text-zinc-500">{releaseDay}</p>
+        )}
+      </div>
     </Link>
   );
 }
